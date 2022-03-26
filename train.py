@@ -1,6 +1,7 @@
-from os import name
-from data import CombinedDataset, FamilyDataset, OneLangDataset, get_dataset
+from argparse import ArgumentParser
 from collections import Counter
+from os import name
+from pathlib import Path
 from typing import Dict
 
 import numpy as np
@@ -8,7 +9,9 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
-from config import BATCH_SIZE, INPUT_SIZE, HS1, HS2, KERNEL_SIZE, NUM_CLASSES
+
+from config import BATCH_SIZE, HS1, HS2, INPUT_SIZE, KERNEL_SIZE, NUM_CLASSES
+from data import CombinedDataset, FamilyDataset, OneLangDataset, get_dataset
 
 
 class MyModel(nn.Module):
@@ -46,10 +49,19 @@ class MyModel(nn.Module):
 
 
 if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('data_save_path', help='Path to save the loaded dataset.')
+    parser.add_argument('model_save_path', help='Path to save the train model.')
+    args = parser.parse_args()
 
     mdl = MyModel()
-    langlist, comb_dataset = get_dataset()
-    torch.save(comb_dataset, 'data.pth')
+    data_path = Path(args.data_save_path)
+    if data_path.exists():
+        comb_dataset = torch.load(data_path)
+    else:
+        _, comb_dataset = get_dataset()
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        torch.save(comb_dataset, data_path)
 
     # This is for training.
     # comb_dl = DataLoader(comb_dataset, shuffle=True, batch_size=batch_size, drop_last=True)  # a data loader is a dynamic loader function from the dataset (randomly)
@@ -121,5 +133,6 @@ if __name__ == '__main__':
             mean_acc = n_correct / n_total
             print(f'mean accuracy: ' + f'{mean_acc:.3f}')
 
-        torch.save(mdl.state_dict(), 'model.pth')
+        Path(args.model_save_path).parent.mkdir(parents=True, exist_ok=True)
+        torch.save(mdl.state_dict(), args.model_save_path)
         # eval dataset must contain all 'deu' and a sample from the rest

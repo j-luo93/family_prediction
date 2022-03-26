@@ -78,9 +78,9 @@ def get_dataset() -> Tuple[List[str], CombinedDataset]:
     removelist = ['livv1243', 'lule1254', 'inar1241', 'bela1254',
                   'latv1249', 'lati1261', 'kaza1248', 'buri1258', 'darg1241']
 
-    words = pd.read_csv('northeuralex-0.9-forms.tsv',
+    words = pd.read_csv('data/northeuralex-0.9-forms.tsv',
                         sep='\t')
-    langs = pd.read_csv('northeuralex-0.9-language-data.tsv',
+    langs = pd.read_csv('data/northeuralex-0.9-language-data.tsv',
                         sep='\t')
 
     wordindices = []
@@ -221,7 +221,7 @@ def get_dataset() -> Tuple[List[str], CombinedDataset]:
     np.save('phoibledata.npy', word_container)
     """
 
-    word_container = np.load('phoibledata.npy', allow_pickle=True)
+    word_container = np.load('data/phoibledata.npy', allow_pickle=True)
 
     for index, i in enumerate(word_container):
         for endex, e in enumerate(i):

@@ -1,17 +1,18 @@
 from argparse import ArgumentParser
-from config import BATCH_SIZE
 
 import torch
 from captum.attr import IntegratedGradients
-from torchfile_attribution import MyModel
 from torch.utils.data import DataLoader
 
+from config import BATCH_SIZE
 from data import get_dataset
+from train import MyModel
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('model_path', help="Path to the saved model.")
     parser.add_argument('data_path', help="Path to the saved dataset.")
+    parser.add_argument('model_path', help="Path to the saved model.")
+    parser.add_argument('output_path', help="Path to save the predicted feature attribution matrices.")
     args = parser.parse_args()
 
     model = MyModel()
@@ -27,3 +28,4 @@ if __name__ == '__main__':
                                                      target=4,
                                                      method='gausslegendre',
                                                      return_convergence_delta=True)
+    torch.save(attributions, 'attributions.pth')
